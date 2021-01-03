@@ -1,6 +1,7 @@
 package service
 
 import (
+	"audit-gateway/middleware"
 	"audit-gateway/model"
 	"fmt"
 	"net/http"
@@ -9,6 +10,20 @@ import (
 	"regexp"
 	"strings"
 )
+
+func CacheService(w http.ResponseWriter, r *http.Request) {
+
+	//从缓存获取对应的key的值
+	value, err := middleware.GoCahce.Get("go_cache_test")
+	if err == false {
+		fmt.Fprintf(w, "获取go_cache_key_first缓存失败")
+		return
+	}
+	res := make(map[string]interface{})
+	res["go_cache_key"] = value
+	fmt.Print(value)
+	fmt.Fprintf(w, "ss")
+}
 
 func AuditProxy(w http.ResponseWriter, req *http.Request) {
 	var routes []model.Route

@@ -41,3 +41,9 @@ func GetRoutes(host string) (routes []Route, err error) {
 	result := DB.Model(&route).Where("host = ?", host).Order("priority_id desc").Find(&routes)
 	return routes, result.Error
 }
+
+func GetAllUpsteremInfo() (ups []UpstreamInfo, err error) {
+	var upstream UpstreamInfo
+	result := DB.Model(&upstream).Find(&ups)
+	return ups, result.Error
+}

@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"audit-gateway/middleware"
 	"audit-gateway/model"
 	"github.com/joho/godotenv"
 	"os"
@@ -12,5 +13,7 @@ func Init() {
 	godotenv.Load()
 	//数据库初始化
 	model.Database(os.Getenv("MYSQL_DSN"))
+	//初始化配置
+	middleware.SetGoCacheData()
 
 }
