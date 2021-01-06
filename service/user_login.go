@@ -38,12 +38,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	// 在session中标记用户已经通过登录验证
 	session.Values["authenticated"] = true
+	session.Values["user"] = name
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
 	fmt.Fprintln(w, "登录成功!", err)
+}
+
+func GetCurrentUser(w http.ResponseWriter, r *http.Request) {
+	session, _ := middleware.SessionStore.Get(r, sessionCookieName)
+	auth := session.Values["authenticated"]
+	if auth == true {
+		user := session.Values["user"]
+		fmt.Fprintf(w, "%s", user)
+	} else {
+		fmt.Fprint(w, "未登录认证")
+	}
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
