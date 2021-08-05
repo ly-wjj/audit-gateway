@@ -67,6 +67,7 @@
 - cooike存储使用gorilla/securecookie
 - 缓存使用github.com/patrickmn/go-cache
 - 日志库使用logrus
+- token认证使用jwt-go
 
 # 项目计划
 2020-12-31 完成访问校验访问代理服务的功能

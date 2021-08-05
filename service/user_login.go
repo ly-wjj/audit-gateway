@@ -4,12 +4,12 @@ import (
 	"audit-gateway/middleware"
 	"audit-gateway/model"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
+	"os"
 )
 
-var sessionCookieName = "user-session"
+var sessionCookieName = os.Getenv("SessionCookieName")
 
 // UserLoginService 管理用户登录的服务
 type UserLoginService struct {
@@ -18,12 +18,7 @@ type UserLoginService struct {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	session, err := middleware.SessionStore.Get(r, sessionCookieName)
-	if err != nil {
-		logrus.Error("failed to login")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	session, err := middleware.SessionStore.New(r, sessionCookieName)
 	// 登录验证
 	name := r.FormValue("username")
 	pass := r.FormValue("password")
@@ -38,8 +33,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "账号或密码错误")
 		return
 	}
+	tokenString := middleware.CreateToken(name)
 	// 在session中标记用户已经通过登录验证
 	session.Values["authenticated"] = true
+	session.Values["Authorization"] = tokenString
 	session.Values["user"] = name
 	err = session.Save(r, w)
 	if err != nil {
@@ -63,6 +60,7 @@ func GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	session, _ := middleware.SessionStore.Get(r, sessionCookieName)
 	session.Values["authenticated"] = false
+	session.Values["Authorization"] = ""
 	session.Save(r, w)
 }
 
