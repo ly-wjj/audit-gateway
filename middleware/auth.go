@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
+	"time"
 )
 
 const (
@@ -27,4 +28,16 @@ func init() {
 		MaxAge:   60 * 15,
 	}
 
+}
+
+func SetGoCacheData(key string) {
+
+}
+
+func GetIntervalConf(dur time.Duration, key string) {
+
+}
+
+func GetGoCacheData(key string) (string, error) {
+	return "", nil
 }

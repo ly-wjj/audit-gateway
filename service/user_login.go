@@ -4,6 +4,7 @@ import (
 	"audit-gateway/middleware"
 	"audit-gateway/model"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
 )
@@ -19,6 +20,7 @@ type UserLoginService struct {
 func Login(w http.ResponseWriter, r *http.Request) {
 	session, err := middleware.SessionStore.Get(r, sessionCookieName)
 	if err != nil {
+		logrus.Error("failed to login")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

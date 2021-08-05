@@ -1,14 +1,17 @@
 package service
 
 import (
-	"audit-gateway/middleware"
-	"audit-gateway/model"
+	"github.com/sirupsen/logrus"
+
 	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"audit-gateway/middleware"
+	"audit-gateway/model"
 )
 
 func CacheService(w http.ResponseWriter, r *http.Request) {
@@ -18,6 +21,18 @@ func CacheService(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuditProxy(w http.ResponseWriter, req *http.Request) {
+	session, _ := middleware.SessionStore.Get(req, sessionCookieName)
+	requestLogger := logrus.WithFields(logrus.Fields{
+		"host":      req.Host,
+		"uri":       req.URL.Path,
+		"user":      session.Values["user"],
+		"source_ip": req.RemoteAddr,
+	})
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		requestLogger.Info("Forbidden")
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
 	var routes []model.Route
 	routes, err := model.GetRoutes(req.Host)
 	if err != nil {
@@ -42,8 +57,8 @@ func AuditProxy(w http.ResponseWriter, req *http.Request) {
 						}
 					}
 				}
+				requestLogger.Info("success")
 				proxy.ServeHTTP(w, req)
-				break
 			}
 			//req.Host = Url.Host
 			return

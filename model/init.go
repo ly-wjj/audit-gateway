@@ -13,7 +13,7 @@ var DB *gorm.DB
 // Database 在中间件中初始化mysql链接
 func Database(connString string) {
 	db, err := gorm.Open("mysql", connString)
-	db.LogMode(true)
+	db.LogMode(false)
 	// Error
 	if err != nil {
 		log.Panic("连接数据库不成功", err)

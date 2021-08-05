@@ -54,4 +54,5 @@ func InitData() {
 	DB.Create(&route)
 	DB.Create(&upstreaminfo)
 	DB.Create(&user)
+	DB.Commit()
 }
